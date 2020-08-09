@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const router = express.Router()
 
+const jwtValidator = require('../jwtValidation')
 const db = require('../database/db')
 
 const saltRounds = 10;
@@ -18,7 +19,6 @@ router.post('/createUser', async (req, res) => {
   // salt password
   let hashedPW = await bcrypt.hash(password, saltRounds)
 
-  // shove new user data into db
   let setNewUser = `INSERT INTO persons (email, name, password) VALUES ($1, $2, $3)`
   try {
     db.query(setNewUser, [email, name, hashedPW], (error, dbResponse) => {
@@ -35,28 +35,39 @@ router.post('/createUser', async (req, res) => {
   }
 })
 
-// login user
 router.post('/login', async (req, res) => {
-  let { email, password } = req.body;
 
-  // validate inputs
+  let { email, password } = req.body.payload;
 
-  // check db, does email exist
   let checkForEmail = `SELECT * FROM persons WHERE email = ($1)`
-  db.query(checkForEmail, [email], (error, dbResponse) => {
-    if (error) {
-      console.log('error: ', error)
-      res.status(error.status).json({ message: error.message })
-    }
-
-    if (!bcrypt.compare(password, dbResponse.rows[0].password)) {
-      res.status(404).json({ message: "email or password may be wrong???" })
-    }
-
-    res.status(200).json({ user: dbResponse.rows[0] })
+  db.query(checkForEmail, [email], async (error, dbResponse) => {
+    if (error) res.status(error.status).json({ message: error.message })
+    
+    bcrypt.compare(password, dbResponse.rows[0].password)
+      .then((result) => {
+        if (result) {
+          let user = {
+            email: dbResponse.rows[0].email, 
+            name: dbResponse.rows[0].name, 
+            id: dbResponse.rows[0].id
+          }
+          let myJWT = jwt.sign({ user }, db.accessTokenSecret)
+          res.status(200).json({ loginSuccess: 'true', userData: user, jwt: myJWT })
+        } else {
+          // how should is end 401 bad login errors without mucking up console
+          res.json({ loginSuccess: 'false', message: "email or password may be wrong???" })
+        }
+      })
   }) 
 })
 
 // check for jwt on load
+
+// check jwt
+router.post('/check-jwt', jwtValidator.validateJWT, (req, res) => {
+  let userId = req.body.userId
+
+  res.status(200).json({ message: `jwt is good, userid = ${ userId }` })
+})
 
 module.exports = router;

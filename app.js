@@ -13,7 +13,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use('/', indexRouter)
-app.use('/auth', authRouter);
+app.use('/auth', authRouter)
 
 app.use((req, res, next) => {
   const error = new Error('Not found')
