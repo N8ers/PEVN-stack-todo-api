@@ -66,9 +66,9 @@ router.post('/login', async (req, res) => {
 
 // check jwt
 router.post('/check-jwt', jwtValidator.validateJWT, (req, res) => {
-  let user = req.body.user
+  let userData = req.body.user
 
-  res.status(200).json({ message: `jwt is good, userid = ${ user }`, user })
+  res.status(200).json({ loginSuccess: 'true', userData })
 })
 
 module.exports = router;
