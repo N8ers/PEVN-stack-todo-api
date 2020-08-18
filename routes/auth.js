@@ -51,6 +51,7 @@ router.post('/login', async (req, res) => {
             name: dbResponse.rows[0].name, 
             id: dbResponse.rows[0].id
           }
+          console.log('user: ', user)
           let myJWT = jwt.sign({ user }, db.accessTokenSecret)
           res.status(200).json({ loginSuccess: 'true', userData: user, jwt: myJWT })
         } else {
@@ -65,9 +66,9 @@ router.post('/login', async (req, res) => {
 
 // check jwt
 router.post('/check-jwt', jwtValidator.validateJWT, (req, res) => {
-  let userId = req.body.userId
+  let user = req.body.user
 
-  res.status(200).json({ message: `jwt is good, userid = ${ userId }` })
+  res.status(200).json({ message: `jwt is good, userid = ${ user }`, user })
 })
 
 module.exports = router;

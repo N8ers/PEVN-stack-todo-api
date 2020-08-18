@@ -11,9 +11,7 @@ async function validateJWT (req, res, next) {
     console.log('jwt verification error: ', err)
     if (err) return res.send({ status: 403, error: err })
 
-    console.log(user)
-    req["body"]
-    req.body["userId"] = user.id
+    req["body"] = user
     next()
   })
 }
