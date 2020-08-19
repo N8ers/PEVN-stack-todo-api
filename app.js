@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
+const tasksRouter = require('./routes/tasks');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use('/', indexRouter)
 app.use('/auth', authRouter)
+app.use('/tasks', tasksRouter)
 
 app.use((req, res, next) => {
   const error = new Error('Not found')
