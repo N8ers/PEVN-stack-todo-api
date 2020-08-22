@@ -18,11 +18,11 @@ router.get("/getTasks", jwtValidator.validateJWT, (req, res) => {
 });
 
 router.post("/addTask", jwtValidator.validateJWT, (req, res) => {
-  let { name, sort_order, completed } = req.body;
+  let { name, sortOrder } = req.body;
   let userId = req.body.user.id;
   let query = "INSERT INTO tasks (user_id, name, sort_order, completed) VALUES ($1, $2, $3, $4)";
 
-  db.query(query, [userId, name, sort_order, completed ], (error, dbResponse) => {
+  db.query(query, [userId, name, sortOrder, false ], (error, dbResponse) => {
     if (error) {
       console.log("error: ", error);
     } else {
