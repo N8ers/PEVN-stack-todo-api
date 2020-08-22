@@ -6,7 +6,7 @@ const db = require("../database/db");
 
 router.get("/getTasks", jwtValidator.validateJWT, (req, res) => {
   let userData = req.body.user;
-  let query = "SELECT * FROM tasks WHERE user_id = ($1)";
+  let query = "SELECT * FROM tasks WHERE user_id = ($1) ORDER BY sort_order";
 
   db.query(query, [userData.id], (error, response) => {
     if (error) { 
@@ -43,5 +43,17 @@ router.post("/deleteTask", jwtValidator.validateJWT, (req, res) => {
   });
 });
 
+router.put("/toggleCompletion", jwtValidator.validateJWT, (req, res) => {
+  let { task_id, completed } = req.body;
+  let query = "UPDATE tasks SET completed=($1) WHERE task_id=($2)";
+
+  db.query(query, [completed, task_id], (error, dbResponse) => {
+    if (error) {
+      console.log("error: ", error);
+    } else {
+      res.status(200).json({ message: "success" });
+    }
+  });
+});
 
 module.exports = router;
