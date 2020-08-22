@@ -7,11 +7,9 @@ async function validateJWT (req, res, next) {
   let token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.sendStatus(401);
 
-  await jwt.verify(token, accessTokenSecret, (err, user) => {
-    // console.log('jwt verification error: ', err)
+  await jwt.verify(token, accessTokenSecret, (err, userData) => {
     if (err) return res.send({ status: 403, error: err });
-
-    req["body"] = user;
+    req.body.user = userData.user;
     next();
   });
 }
