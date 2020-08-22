@@ -26,7 +26,7 @@ router.post("/createUser", async (req, res) => {
         console.log("error: ", error);
         res.status(error.status).json({ message: error.message });
       } else {
-        res.sendStatus(200);
+        res.status(200).json({ message: "success" });
       }
     });
   } catch {
