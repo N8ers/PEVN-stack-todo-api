@@ -29,7 +29,18 @@ router.post("/addTask", jwtValidator.validateJWT, (req, res) => {
       res.status(200).json({ message: "success" });
     }
   });
+});
 
+router.post("/deleteTask", jwtValidator.validateJWT, (req, res) => {
+  let query = "DELETE FROM tasks WHERE task_id = ($1)";
+
+  db.query(query, [req.body.task_id], (error, dbResponse) => {
+    if (error) {
+      console.log("error: ", error);
+    } else {
+      res.status(200).json({ message: "success" });
+    }
+  });
 });
 
 
