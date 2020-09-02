@@ -56,4 +56,17 @@ router.put("/toggleCompletion", jwtValidator.validateJWT, (req, res) => {
   });
 });
 
+router.put("/updateTask", jwtValidator.validateJWT, (req, res) => {
+  let { task_id, name } = req.body;
+  let query = "UPDATE tasks SET name=($1) WHERE task_id=($2)";
+
+  db.query(query, [name, task_id], (error, dbResponse) => {
+    if (error) {
+      console.log("error: ", error);
+    } else {
+      res.status(200).json({ message: "success" });
+    }
+  });
+});
+
 module.exports = router;
