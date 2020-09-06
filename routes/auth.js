@@ -8,40 +8,39 @@ const db = require("../database/db");
 
 const saltRounds = 10;
 
+
 // create new user
 router.post("/createUser", async (req, res) => {
   let { email, name, password } = req.body;
 
-  // validate inputs
+  const { rows } = await db.query("SELECT * FROM persons WHERE email = ($1)", [email]);
 
-  // validate email is not already in use
-
-  // salt password
-  let hashedPW = await bcrypt.hash(password, saltRounds);
-
-  let setNewUser = "INSERT INTO persons (email, name, password) VALUES ($1, $2, $3)";
-  try {
-    db.query(setNewUser, [email, name, hashedPW], (error, dbResponse) => {
-      if (error) {
-        console.log("error: ", error);
-        res.status(error.status).json({ message: error.message });
-      } else {
-        res.status(200).json({ message: "success" });
-      }
-    });
-  } catch {
-    console.log("SORRY something went wrong");
-    res.sendStatus(404).json({ message: "/createUser failed" });
+  if (rows.length) {
+    res.status(200).json({ message: "email already in use" });
+    console.log("email is already in use");
+    return;
   }
+
+  let hashedPW = await bcrypt.hash(password, saltRounds);
+  let setNewUser = "INSERT INTO persons (email, name, password) VALUES ($1, $2, $3)";
+
+  db.query(setNewUser, [email, name, hashedPW], (error, dbResponse) => {
+    if (error) res.status(200).json({ message: error.message });
+    res.status(200).json({ message: "success" });
+  });
 });
 
 router.post("/login", async (req, res) => {
+
+  console.log("/login ", req.body.payload);
 
   let { email, password } = req.body.payload;
 
   let checkForEmail = "SELECT * FROM persons WHERE email = ($1)";
   db.query(checkForEmail, [email], async (error, dbResponse) => {
-    if (error) res.status(error.status).json({ message: error.message });
+    console.log("dbResponse ", dbResponse.rows.length);
+    if(!dbResponse.rows.length) res.status(200).json({ loginSuccess: false, message: "no such user exists" });
+    if (error) res.status(error.status).json({ loginSuccess: false, message: error.message });
     
     bcrypt.compare(password, dbResponse.rows[0].password)
       .then((result) => {
