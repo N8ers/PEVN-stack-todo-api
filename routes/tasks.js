@@ -69,4 +69,25 @@ router.put("/updateTask", jwtValidator.validateJWT, (req, res) => {
   });
 });
 
+router.put("/updateSortOrder", jwtValidator.validateJWT, (req, res) => {
+  let tasks = req.body;
+  let errorOccured = false;
+
+  for(let i = 0; i < tasks.length; i++) {
+    let query = `UPDATE tasks SET sort_order = ${tasks[i].sort_order} WHERE task_id = ${tasks[i].task_id}`;
+    db.query(query, null, (error, dbResponse) => {
+      if (error) {
+        console.log("error: ", error);
+        errorOccured = true;
+      } else {
+        console.log("success for ", tasks[i].name);
+      }
+    });
+  }
+
+  if (!errorOccured) {
+    res.status(200).json({ message: "success" });
+  }
+});
+
 module.exports = router;
