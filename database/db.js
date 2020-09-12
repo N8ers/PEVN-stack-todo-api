@@ -9,8 +9,6 @@ const pool = new Pool({
   max: 20
 });
 
-// NATHAN review this file... 
-
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
 module.exports = {
