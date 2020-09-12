@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config();
 
+const port = process.env.PORT || 3000;
+
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
 const tasksRouter = require("./routes/tasks");
@@ -32,4 +34,4 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(3000, () => console.log("server running 3000"));
+app.listen(port, () => console.log("server running 3000"));
